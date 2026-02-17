@@ -19,10 +19,16 @@ async function sendSignalMessage({ signalCliPath, account, to, message, dryRun =
     return { dryRun: true, to };
   }
 
-  if (!account) throw new Error('SIGNAL_ACCOUNT is required');
-
-  const args = ['-a', account, 'send', '-m', message, to];
-  return runSignalCli(signalCliPath, args);
+  const args = ['message', 'send', '--channel', 'signal', '--target', to, '--message', message];
+  return new Promise((resolve, reject) => {
+    execFile('openclaw', args, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`openclaw message send failed: ${stderr || error.message}`));
+        return;
+      }
+      resolve({ stdout, stderr });
+    });
+  });
 }
 
 function extractIncomingMessage(line) {
