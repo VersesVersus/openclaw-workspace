@@ -101,15 +101,19 @@ async function runDelivery(config, { dryRun = false } = {}) {
   return { verse, results };
 }
 
-async function handleInboundReplyOnce(config, incoming) {
+async function handleInboundReplyOnce(config, incoming, options = {}) {
   if (!incoming || !incoming.from || !incoming.text) {
     throw new Error('Inbound reply requires --from and --text');
   }
 
-  try {
-    await publishSignalInbound({ from: incoming.from, text: incoming.text, target: config.signalAccount, source: 'dailyverse' });
-  } catch (err) {
-    console.error(`Dispatcher publish warning: ${err.message}`);
+  const { publish = true } = options;
+
+  if (publish) {
+    try {
+      await publishSignalInbound({ from: incoming.from, text: incoming.text, target: config.signalAccount, source: 'dailyverse' });
+    } catch (err) {
+      console.error(`Dispatcher publish warning: ${err.message}`);
+    }
   }
 
   return processInboundReply(
@@ -142,6 +146,42 @@ async function pollIncomingRepliesOnce(config) {
   }
 
   return { polled: messages.length, processed };
+}
+
+async function consumeDispatcherRepliesOnce(config) {
+  const { execFile } = require('child_process');
+  const dispatcher = '/home/james/.openclaw/workspace/shared/signal_dispatcher.py';
+
+  const result = await new Promise((resolve, reject) => {
+    const args = [dispatcher, 'consume', '--consumer', 'dailyverse-replies', '--channel', 'signal', '--from', String(config.signalAccount || ''), '--limit', '50'];
+    execFile('python3', args, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(stderr || error.message));
+        return;
+      }
+      resolve(stdout);
+    });
+  });
+
+  let payload;
+  try {
+    payload = JSON.parse(String(result || '{}'));
+  } catch {
+    return { consumed: 0, processed: 0 };
+  }
+
+  const events = Array.isArray(payload.events) ? payload.events : [];
+  let processed = 0;
+  for (const ev of events) {
+    const r = await handleInboundReplyOnce(
+      config,
+      { from: ev.from, text: ev.text, groupId: null },
+      { publish: false }
+    );
+    if (!r.ignored) processed += 1;
+  }
+
+  return { consumed: events.length, processed };
 }
 
 async function processDevotionalQueueOnce(config) {
@@ -208,12 +248,19 @@ async function main() {
   const pollOnce = args.has('--poll-once');
   const queueOnce = args.has('--queue-once');
   const handleReply = args.has('--handle-reply');
+  const consumeDispatch = args.has('--consume-dispatch');
 
   if (handleReply) {
     const from = getArgValue(argv, '--from');
     const text = getArgValue(argv, '--text');
     const result = await handleInboundReplyOnce(config, { from, text });
     console.log(`Inbound reply handled: ${JSON.stringify(result)}`);
+    return;
+  }
+
+  if (consumeDispatch) {
+    const stats = await consumeDispatcherRepliesOnce(config);
+    console.log(`Dispatcher consume complete. Consumed: ${stats.consumed}, Processed: ${stats.processed}`);
     return;
   }
 

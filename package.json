@@ -9,6 +9,7 @@
     "send-once:dry": "node src/index.js --once --dry-run",
     "poll-replies-once": "node src/index.js --poll-once",
     "handle-reply": "node src/index.js --handle-reply",
+    "consume-dispatch-once": "node src/index.js --consume-dispatch",
     "run-devotionals-once": "node src/index.js --queue-once",
     "specialist:task": "node scripts/build-specialist-task.js"
   },
