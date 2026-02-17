@@ -1,1 +1,4 @@
 .openclaw/
+shared/.dispatcher/
+shared/__pycache__/
+*.pyc
