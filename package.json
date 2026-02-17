@@ -1,0 +1,12 @@
+{
+  "name": "dailyverse",
+  "version": "0.1.0",
+  "description": "Daily Bible verse delivery MVP via signal-cli",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "send-once": "node src/index.js --once",
+    "send-once:dry": "node src/index.js --once --dry-run"
+  },
+  "license": "MIT"
+}
