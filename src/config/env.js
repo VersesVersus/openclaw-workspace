@@ -43,6 +43,7 @@ function getConfig() {
     devotionalQueueFile: process.env.DEVOTIONAL_QUEUE_FILE || 'data/devotional-queue.json',
     replyPollIntervalSeconds: intFromEnv('REPLY_POLL_INTERVAL_SECONDS', 90),
     replyPollReceiveTimeoutSeconds: intFromEnv('REPLY_POLL_RECEIVE_TIMEOUT_SECONDS', 5),
+    replyPollMode: (process.env.REPLY_POLL_MODE || 'openclaw').toLowerCase(),
     earlyEveningHour: intFromEnv('EARLY_EVENING_HOUR', 18),
     devotionalImmediateAfterHour: intFromEnv('DEVOTIONAL_IMMEDIATE_AFTER_HOUR', 17),
     timezone: process.env.TIMEZONE || 'America/New_York'

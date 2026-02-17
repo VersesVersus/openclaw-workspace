@@ -21,6 +21,12 @@ function normalizeNumber(value) {
   return String(value || '').replace(/[^\d+]/g, '');
 }
 
+function getArgValue(argv, flag) {
+  const idx = argv.indexOf(flag);
+  if (idx === -1) return null;
+  return argv[idx + 1] ?? null;
+}
+
 async function sendWithRetry(sendFn, attempts = 3) {
   let lastErr;
   for (let i = 1; i <= attempts; i++) {
@@ -94,7 +100,25 @@ async function runDelivery(config, { dryRun = false } = {}) {
   return { verse, results };
 }
 
+async function handleInboundReplyOnce(config, incoming) {
+  if (!incoming || !incoming.from || !incoming.text) {
+    throw new Error('Inbound reply requires --from and --text');
+  }
+
+  return processInboundReply(
+    { from: incoming.from, text: String(incoming.text).trim(), groupId: incoming.groupId || null },
+    config,
+    async (to, text) => {
+      await sendMessage(config, to, text, false);
+    }
+  );
+}
+
 async function pollIncomingRepliesOnce(config) {
+  if (config.replyPollMode !== 'signal-cli') {
+    return { polled: 0, processed: 0, skipped: true, mode: config.replyPollMode };
+  }
+
   const messages = await receiveSignalMessages({
     signalCliPath: config.signalCliPath,
     account: config.signalAccount,
@@ -104,16 +128,9 @@ async function pollIncomingRepliesOnce(config) {
   if (messages.length === 0) return { polled: 0, processed: 0 };
 
   let processed = 0;
-  const ownNumber = normalizeNumber(config.signalAccount);
-
   for (const msg of messages) {
     if (msg.groupId) continue;
-    if (normalizeNumber(msg.from) === ownNumber) continue;
-
-    const result = await processInboundReply(msg, config, async (to, text) => {
-      await sendMessage(config, to, text, false);
-    });
-
+    const result = await handleInboundReplyOnce(config, msg);
     if (!result.ignored) processed += 1;
   }
 
@@ -127,6 +144,11 @@ async function processDevotionalQueueOnce(config) {
 }
 
 function startReplyPolling(config) {
+  if (config.replyPollMode !== 'signal-cli') {
+    console.log(`Reply polling via signal-cli disabled (REPLY_POLL_MODE=${config.replyPollMode}). Use OpenClaw session/channel path with --handle-reply.`);
+    return;
+  }
+
   const intervalMs = Math.max(15, config.replyPollIntervalSeconds) * 1000;
   let busy = false;
 
@@ -172,11 +194,21 @@ function startDevotionalQueueWorker(config) {
 
 async function main() {
   const config = getConfig();
-  const args = new Set(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  const args = new Set(argv);
   const once = args.has('--once');
   const dryRun = args.has('--dry-run');
   const pollOnce = args.has('--poll-once');
   const queueOnce = args.has('--queue-once');
+  const handleReply = args.has('--handle-reply');
+
+  if (handleReply) {
+    const from = getArgValue(argv, '--from');
+    const text = getArgValue(argv, '--text');
+    const result = await handleInboundReplyOnce(config, { from, text });
+    console.log(`Inbound reply handled: ${JSON.stringify(result)}`);
+    return;
+  }
 
   if (once) {
     await runDelivery(config, { dryRun });
