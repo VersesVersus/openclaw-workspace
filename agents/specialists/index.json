@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "specialists": [
+    {
+      "id": "builder",
+      "name": "Builder Agent",
+      "mission": "Implement and ship Phase 1 code changes safely with clean commits.",
+      "preferredSkills": ["github"],
+      "defaultOutputs": [
+        "Working code changes",
+        "Focused commits with clear messages",
+        "Short implementation note with test evidence"
+      ],
+      "qualityBar": [
+        "Keep scope aligned to current phase",
+        "Avoid breaking delivery paths",
+        "Document any config/env changes"
+      ]
+    },
+    {
+      "id": "delivery-ops",
+      "name": "Delivery Ops Agent",
+      "mission": "Harden reliability, observability, and delivery operations for daily verse sends.",
+      "preferredSkills": ["healthcheck", "github"],
+      "defaultOutputs": [
+        "Reliability checks and findings",
+        "Actionable mitigation tasks",
+        "Runbook updates for incidents"
+      ],
+      "qualityBar": [
+        "Prioritize >99% delivery success",
+        "Flag risks before outages",
+        "Prefer reversible operational changes"
+      ]
+    },
+    {
+      "id": "notion-pm",
+      "name": "Notion PM Agent",
+      "mission": "Maintain project planning artifacts, status pages, and execution clarity in Notion.",
+      "preferredSkills": ["notion"],
+      "defaultOutputs": [
+        "Updated roadmap/status pages",
+        "Daily/weekly project summaries",
+        "Decision and blocker tracking"
+      ],
+      "qualityBar": [
+        "Keep updates concise and factual",
+        "Use stable naming conventions",
+        "Include next concrete actions"
+      ]
+    },
+    {
+      "id": "research",
+      "name": "Research Agent",
+      "mission": "Investigate APIs, architecture options, and implementation tradeoffs for upcoming phases.",
+      "preferredSkills": ["github", "notion"],
+      "defaultOutputs": [
+        "Decision-ready comparisons",
+        "Implementation recommendations",
+        "Risk and dependency notes"
+      ],
+      "qualityBar": [
+        "Separate facts from assumptions",
+        "Cite source links where possible",
+        "Recommend pragmatic next steps"
+      ]
+    }
+  ]
+}

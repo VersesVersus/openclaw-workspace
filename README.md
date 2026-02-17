@@ -29,6 +29,23 @@ Random daily Bible verse delivery scaffold using:
    npm start
    ```
 
+## Specialized agent setup
+
+This repo includes reusable specialist definitions under `agents/specialists/`:
+
+- `builder`
+- `delivery-ops`
+- `notion-pm`
+- `research`
+
+Generate a role-scoped task prompt:
+
+```bash
+npm run specialist:task -- builder "Implement delivery retry telemetry"
+```
+
+You can paste the generated prompt into a sub-agent run (`sessions_spawn`) or an isolated cron `agentTurn`.
+
 ## Notes
 
 - If `SIGNAL_RECIPIENTS` is empty, active subscribers in `data/subscribers.json` are used.
