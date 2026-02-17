@@ -4,6 +4,7 @@ const { fetchVerseByReference } = require('./providers/verseProvider');
 const { formatVerseMessage } = require('./format/messageFormatter');
 const { getActiveSubscriberPhones } = require('./subscribers/store');
 const { sendSignalMessage, receiveSignalMessages } = require('./integrations/signalCli');
+const { publishSignalInbound } = require('./integrations/inboundDispatcher');
 const { scheduleDaily } = require('./scheduler/dailyScheduler');
 const { loadRotationState, pickWeightedReference } = require('./verses/rotationStore');
 const { logDelivery } = require('./delivery/historyStore');
@@ -103,6 +104,12 @@ async function runDelivery(config, { dryRun = false } = {}) {
 async function handleInboundReplyOnce(config, incoming) {
   if (!incoming || !incoming.from || !incoming.text) {
     throw new Error('Inbound reply requires --from and --text');
+  }
+
+  try {
+    await publishSignalInbound({ from: incoming.from, text: incoming.text, target: config.signalAccount, source: 'dailyverse' });
+  } catch (err) {
+    console.error(`Dispatcher publish warning: ${err.message}`);
   }
 
   return processInboundReply(
