@@ -54,7 +54,7 @@ function extractIncomingMessage(line) {
 async function receiveSignalMessages({ signalCliPath, account, timeoutSeconds = 5 }) {
   if (!account) return [];
 
-  const args = ['-a', account, 'receive', '--json', '--timeout', String(timeoutSeconds)];
+  const args = ['-o', 'json', '-a', account, 'receive', '--timeout', String(timeoutSeconds), '--max-messages', '20'];
   const { stdout } = await runSignalCli(signalCliPath, args);
 
   const lines = String(stdout || '')
