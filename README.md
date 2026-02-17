@@ -46,8 +46,34 @@ npm run specialist:task -- builder "Implement delivery retry telemetry"
 
 You can paste the generated prompt into a sub-agent run (`sessions_spawn`) or an isolated cron `agentTurn`.
 
+## Verse reply actions (1-4)
+
+Each sent verse now includes interactive prompts:
+
+- `1` / `Amen` → marks verse as key and boosts future selection weight
+- `2` / `Wisdom` → sends thematic + original-language insight reply
+- `3` / `Devotional` → sends devotional immediately (after 5 PM) or queues for early evening same day
+- `4` / `Retire` → removes verse from future random rotation
+
+Useful commands:
+
+```bash
+npm run poll-replies-once
+npm run run-devotionals-once
+```
+
+State files are written in `data/`:
+
+- `delivery-log.json`
+- `verse-feedback.json`
+- `devotional-queue.json`
+
+## WhatsApp setup note
+
+OpenClaw WhatsApp support lives at the channel layer (separate from this Node runtime). Use OpenClaw channel commands to configure login/pairing and policy before routing delivery there.
+
 ## Notes
 
 - If `SIGNAL_RECIPIENTS` is empty, active subscribers in `data/subscribers.json` are used.
 - Scheduler runs once per day at `DELIVERY_HOUR:DELIVERY_MINUTE` (local time).
-- This is MVP scaffolding aligned to Phase 1 random-verse delivery.
+- This scaffold now supports weighted verse rotation, reply actions, and queued devotionals.

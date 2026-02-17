@@ -1,9 +1,3 @@
-const seedReferences = require('../data/seedReferences');
-
-function randomFrom(list) {
-  return list[Math.floor(Math.random() * list.length)];
-}
-
 async function fetchVerseByReference(reference, bibleApiBaseUrl) {
   const url = `${bibleApiBaseUrl}/${encodeURIComponent(reference)}`;
   const res = await fetch(url);
@@ -17,9 +11,4 @@ async function fetchVerseByReference(reference, bibleApiBaseUrl) {
   return { text, reference: ref, sourceUrl: url };
 }
 
-async function getRandomVerse(bibleApiBaseUrl) {
-  const reference = randomFrom(seedReferences);
-  return fetchVerseByReference(reference, bibleApiBaseUrl);
-}
-
-module.exports = { getRandomVerse };
+module.exports = { fetchVerseByReference };

@@ -37,7 +37,15 @@ function getConfig() {
     deliveryHour: intFromEnv('DELIVERY_HOUR', 9),
     deliveryMinute: intFromEnv('DELIVERY_MINUTE', 0),
     bibleApiBaseUrl: process.env.BIBLE_API_BASE_URL || 'https://bible-api.com',
-    subscribersFile: process.env.SUBSCRIBERS_FILE || 'data/subscribers.json'
+    subscribersFile: process.env.SUBSCRIBERS_FILE || 'data/subscribers.json',
+    verseFeedbackFile: process.env.VERSE_FEEDBACK_FILE || 'data/verse-feedback.json',
+    deliveryLogFile: process.env.DELIVERY_LOG_FILE || 'data/delivery-log.json',
+    devotionalQueueFile: process.env.DEVOTIONAL_QUEUE_FILE || 'data/devotional-queue.json',
+    replyPollIntervalSeconds: intFromEnv('REPLY_POLL_INTERVAL_SECONDS', 90),
+    replyPollReceiveTimeoutSeconds: intFromEnv('REPLY_POLL_RECEIVE_TIMEOUT_SECONDS', 5),
+    earlyEveningHour: intFromEnv('EARLY_EVENING_HOUR', 18),
+    devotionalImmediateAfterHour: intFromEnv('DEVOTIONAL_IMMEDIATE_AFTER_HOUR', 17),
+    timezone: process.env.TIMEZONE || 'America/New_York'
   };
 }
 

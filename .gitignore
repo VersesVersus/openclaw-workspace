@@ -3,3 +3,7 @@ node_modules/
 .DS_Store
 coverage/
 *.log
+
+data/delivery-log.json
+data/verse-feedback.json
+data/devotional-queue.json

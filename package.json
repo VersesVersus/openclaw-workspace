@@ -7,6 +7,8 @@
     "start": "node src/index.js",
     "send-once": "node src/index.js --once",
     "send-once:dry": "node src/index.js --once --dry-run",
+    "poll-replies-once": "node src/index.js --poll-once",
+    "run-devotionals-once": "node src/index.js --queue-once",
     "specialist:task": "node scripts/build-specialist-task.js"
   },
   "license": "MIT"
